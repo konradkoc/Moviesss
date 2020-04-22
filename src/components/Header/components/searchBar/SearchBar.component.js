@@ -1,17 +1,17 @@
 import React , { useState } from 'react'
 import { ButtonStyle, InputStyle , SearchBarContainer } from './SearchBar.styles'
+import {connect} from 'react-redux'
+import { searchFor } from '../../../../redux/searchbox/search.actions'
 
-const SearchBar = () => {
+const SearchBar = ( {searchFor} ) => {
 const [searchQuery, setSearchQuery] = useState('')
 
-const fetchDataAsync = e => {
-    const API_KEY= '0946d9223ef9f8efbdd8a35f5ef3bdc1'
-    e.preventDefault()
-    fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&language=en-US&query=${searchQuery}&include_adult=false`)
-        .then(res => res.json())
-        .then(data => console.log(data))
-
-    setSearchQuery('')
+const searchForCollections = (searchQuery) => {
+    //searchQUery from state, trigger action only if query != '' , clear searchbox
+    if (searchQuery) {
+        searchFor(searchQuery)
+        setSearchQuery('')
+    }  
 }
     
     return (
@@ -20,11 +20,12 @@ const fetchDataAsync = e => {
                 type ='text'
                 value = {searchQuery} 
                 placeholder = "Search for a movie, TV show or a person..."
-                onChange = { e => setSearchQuery(e.target.value) }>
+                onChange = { e => setSearchQuery(e.target.value) }
+            >
             </InputStyle>
 
             <ButtonStyle
-                onClick = { e => fetchDataAsync(e) }
+                onClick= { () => searchForCollections(searchQuery)}
                 type = 'submit'>
                 <span class="fas fa-search"> </span>           
             </ButtonStyle>
@@ -32,4 +33,10 @@ const fetchDataAsync = e => {
     )
 }
 
-export default SearchBar
+
+const mapDispatchToProps = dispatch => ({
+    searchFor: (searchQuery) => dispatch(searchFor(searchQuery))
+})
+
+
+export default connect(null, mapDispatchToProps)(SearchBar)
